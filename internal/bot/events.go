@@ -158,9 +158,21 @@ func (h *Handler) OnMessageCreate(event *events.MessageCreate) {
 
 	mentions := make([]tts.Mention, len(event.Message.Mentions))
 	for i, user := range event.Message.Mentions {
+		displayName := user.EffectiveName()
+		if event.GuildID != nil {
+			if client := event.Client(); client.Caches != nil {
+				if member, ok := client.Caches.Member(*event.GuildID, user.ID); ok {
+					displayName = member.EffectiveName()
+				} else if member, err := client.Rest.GetMember(*event.GuildID, user.ID); err == nil {
+					displayName = member.EffectiveName()
+				}
+			} else if member, err := event.Client().Rest.GetMember(*event.GuildID, user.ID); err == nil {
+				displayName = member.EffectiveName()
+			}
+		}
 		mentions[i] = tts.Mention{
 			ID:          user.ID.String(),
-			DisplayName: user.EffectiveName(),
+			DisplayName: displayName,
 		}
 	}
 
