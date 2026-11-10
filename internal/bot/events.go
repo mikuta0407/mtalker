@@ -524,7 +524,6 @@ func (h *Handler) openVoiceSession(client *disgobot.Client, guildID snowflake.ID
 	}
 
 	conn := client.VoiceManager.CreateConn(guildID)
-	h.attachVoiceConnEventHandler(guildID, conn)
 	sess, err := h.sessions.Create(session.CreateParams{
 		GuildID:        guildID,
 		TextChannelID:  textChannelID,
@@ -780,16 +779,6 @@ func (h *Handler) extendPendingVoiceGatewayClose(guildID snowflake.ID) bool {
 	})
 	h.voiceGatewayCloseMu.Unlock()
 	return true
-}
-
-func (h *Handler) attachVoiceConnEventHandler(guildID snowflake.ID, conn voice.Conn) {
-	if conn == nil {
-		return
-	}
-
-	conn.SetEventHandlerFunc(func(gateway voice.Gateway, opCode voice.Opcode, sequenceNumber int, data voice.GatewayMessageData) {
-		h.onVoiceGatewayEvent(guildID, opCode)
-	})
 }
 
 func (h *Handler) onVoiceGatewayEvent(guildID snowflake.ID, opCode voice.Opcode) {

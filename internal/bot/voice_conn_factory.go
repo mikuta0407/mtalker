@@ -17,6 +17,13 @@ const voiceGatewayCloseCodeCallTerminated = 4022
 func NewVoiceConnCreateFunc(handler *Handler) voice.ConnCreateFunc {
 	return func(guildID snowflake.ID, userID snowflake.ID, voiceStateUpdateFunc voice.StateUpdateFunc, removeConnFunc func(), opts ...voice.ConnConfigOpt) voice.Conn {
 		connOpts := append([]voice.ConnConfigOpt{}, opts...)
+		if handler != nil {
+			connOpts = append(connOpts, voice.WithConnEventHandlerFunc(
+				func(_ voice.Gateway, opCode voice.Opcode, _ int, _ voice.GatewayMessageData) {
+					handler.onVoiceGatewayEvent(guildID, opCode)
+				},
+			))
+		}
 		connOpts = append(connOpts, voice.WithConnGatewayCreateFunc(
 			func(
 				daveSession godave.Session,
@@ -26,18 +33,17 @@ func NewVoiceConnCreateFunc(handler *Handler) voice.ConnCreateFunc {
 			) voice.Gateway {
 				wrappedCloseHandler := closeHandlerFunc
 				if handler != nil {
-					wrappedCloseHandler = func(gateway voice.Gateway, err error, reconnect bool) {
+					wrappedCloseHandler = func(gateway voice.Gateway, err error) {
 						if isVoiceGatewayCloseCode(err, voiceGatewayCloseCodeCallTerminated) {
 							handler.WaitForVoiceServerRecovery(guildID, func() {
-								closeHandlerFunc(gateway, err, reconnect)
+								closeHandlerFunc(gateway, err)
 							})
 							return
 						}
-						closeHandlerFunc(gateway, err, reconnect)
+						closeHandlerFunc(gateway, err)
 					}
 				}
 
-				gatewayOpts = append(gatewayOpts, voice.WithGatewayAutoReconnect(false))
 				return newRecoverableGateway(daveSession, eventHandlerFunc, wrappedCloseHandler, gatewayOpts...)
 			},
 		))
@@ -70,14 +76,14 @@ func newRecoverableGateway(
 }
 
 func (g *recoverableGateway) createUnderlying() voice.Gateway {
-	return g.newUnderlying(func(_ voice.Gateway, err error, reconnect bool) {
+	return g.newUnderlying(func(_ voice.Gateway, err error) {
 		if isVoiceGatewayCloseCode(err, voiceGatewayCloseCodeCallTerminated) {
 			g.mu.Lock()
 			g.recreateOnNextOpen = true
 			g.mu.Unlock()
 		}
 		if g.closeHandler != nil {
-			g.closeHandler(g, err, reconnect)
+			g.closeHandler(g, err)
 		}
 	})
 }

@@ -8,6 +8,7 @@ import (
 
 	botgateway "github.com/disgoorg/disgo/gateway"
 	"github.com/disgoorg/disgo/voice"
+	"github.com/disgoorg/godave"
 	"github.com/disgoorg/snowflake/v2"
 )
 
@@ -305,8 +306,6 @@ func (c *stubConn) SetOpusFrameProvider(handler voice.OpusFrameProvider) {}
 
 func (c *stubConn) SetOpusFrameReceiver(handler voice.OpusFrameReceiver) {}
 
-func (c *stubConn) SetEventHandlerFunc(eventHandlerFunc voice.EventHandlerFunc) {}
-
 func (c *stubConn) Open(ctx context.Context, channelID snowflake.ID, selfMute bool, selfDeaf bool) error {
 	c.channelID = &channelID
 	return nil
@@ -324,3 +323,5 @@ func (c *stubConn) Close(ctx context.Context) {
 func (c *stubConn) HandleVoiceStateUpdate(update botgateway.EventVoiceStateUpdate) {}
 
 func (c *stubConn) HandleVoiceServerUpdate(update botgateway.EventVoiceServerUpdate) {}
+
+func (c *stubConn) DAVE() godave.Session { return nil }

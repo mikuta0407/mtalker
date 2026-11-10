@@ -13,6 +13,7 @@ import (
 
 	botgateway "github.com/disgoorg/disgo/gateway"
 	"github.com/disgoorg/disgo/voice"
+	"github.com/disgoorg/godave"
 	"github.com/disgoorg/snowflake/v2"
 )
 
@@ -164,9 +165,8 @@ func (c *testConn) SetSpeaking(ctx context.Context, flags voice.SpeakingFlags) e
 	c.speakingFlags = append(c.speakingFlags, flags)
 	return nil
 }
-func (c *testConn) SetOpusFrameProvider(handler voice.OpusFrameProvider)        {}
-func (c *testConn) SetOpusFrameReceiver(handler voice.OpusFrameReceiver)        {}
-func (c *testConn) SetEventHandlerFunc(eventHandlerFunc voice.EventHandlerFunc) {}
+func (c *testConn) SetOpusFrameProvider(handler voice.OpusFrameProvider) {}
+func (c *testConn) SetOpusFrameReceiver(handler voice.OpusFrameReceiver) {}
 func (c *testConn) Open(ctx context.Context, channelID snowflake.ID, selfMute bool, selfDeaf bool) error {
 	return nil
 }
@@ -194,3 +194,5 @@ func (c *testUDPConn) Write(p []byte) (int, error) {
 	c.writeCount++
 	return len(p), nil
 }
+
+func (c *testConn) DAVE() godave.Session { return nil }

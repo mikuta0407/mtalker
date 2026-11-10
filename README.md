@@ -65,7 +65,7 @@ docker compose down
 
 ## ローカル実行の前提条件
 
-- Go 1.26 以上
+- Go 1.27 以上
 - `open_jtalk` コマンドが `PATH` 上に存在すること
 - `open_jtalk` 用の辞書ディレクトリ
 - `.htsvoice` ファイル

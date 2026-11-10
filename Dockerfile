@@ -1,4 +1,4 @@
-FROM golang:1.26-bookworm
+FROM golang:1.27-trixie
 
 ARG LIBDAVE_VERSION=v1.1.0
 
@@ -33,7 +33,7 @@ RUN mkdir -p /opt/voices /opt/licenses/tohoku-f01 \
     && curl -fsSL -o /opt/voices/tohoku-f01-neutral.htsvoice https://raw.githubusercontent.com/icn-lab/htsvoice-tohoku-f01/master/tohoku-f01-neutral.htsvoice \
     && curl -fsSL -o /opt/licenses/tohoku-f01/COPYRIGHT.txt https://raw.githubusercontent.com/icn-lab/htsvoice-tohoku-f01/master/COPYRIGHT.txt
 
-RUN curl -fsSL -o /tmp/libdave_install.sh https://raw.githubusercontent.com/disgoorg/godave/refs/heads/master/scripts/libdave_install.sh \
+RUN curl -fsSL -o /tmp/libdave_install.sh https://raw.githubusercontent.com/disgoorg/godave/refs/tags/v0.3.0/scripts/libdave_install.sh \
     && chmod +x /tmp/libdave_install.sh \
     && FORCE_BUILD=1 NON_INTERACTIVE=1 /tmp/libdave_install.sh ${LIBDAVE_VERSION} \
     && rm -f /tmp/libdave_install.sh
